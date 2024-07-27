@@ -17,7 +17,7 @@ public interface AlbumRepository extends JpaRepository<AlbumEntity, Long> {
 
     @Query(value = "SELECT * FROM sample_app.albums as v " +
             "JOIN sample_app.artists as a ON v.artist_id = a.id " +
-            "WHERE a.name = :artistName", nativeQuery = true)
+            "WHERE a.artist = :artistName", nativeQuery = true)
     List<AlbumEntity> findByArtist(@Param("artistName") String artistName);
 
     List<AlbumEntity> findByArtistId(Long id);

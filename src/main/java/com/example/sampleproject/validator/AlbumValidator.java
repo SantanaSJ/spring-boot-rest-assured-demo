@@ -1,6 +1,6 @@
 package com.example.sampleproject.validator;
 
-import com.example.sampleproject.model.service.AlbumServiceModel;
+import com.example.sampleproject.model.serviceModels.AlbumServiceModel;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

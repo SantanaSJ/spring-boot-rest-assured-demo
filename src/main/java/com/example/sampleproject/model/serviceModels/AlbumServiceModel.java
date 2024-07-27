@@ -1,4 +1,4 @@
-package com.example.sampleproject.model.service;
+package com.example.sampleproject.model.serviceModels;
 
 
 public class AlbumServiceModel {

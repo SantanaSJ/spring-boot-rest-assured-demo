@@ -1,11 +1,10 @@
-package com.example.sampleproject.model.service;
-
-import jdk.jfr.Name;
+package com.example.sampleproject.model.serviceModels;
 
 import java.util.List;
 
 public class ArtistServiceModel {
 
+    private long id;
     private String artist;
     private String description;
 
@@ -35,5 +34,14 @@ public class ArtistServiceModel {
 
     public void setAlbums(List<AlbumServiceModel> albums) {
         this.albums = albums;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public ArtistServiceModel setId(long id) {
+        this.id = id;
+        return this;
     }
 }

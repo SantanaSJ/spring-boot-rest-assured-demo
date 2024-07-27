@@ -5,8 +5,8 @@ import com.example.sampleproject.model.binding.ArtistAddBindingModel;
 import com.example.sampleproject.model.binding.UpdateArtistBindingModel;
 import com.example.sampleproject.model.entities.AlbumEntity;
 import com.example.sampleproject.model.entities.ArtistEntity;
-import com.example.sampleproject.model.service.AlbumServiceModel;
-import com.example.sampleproject.model.service.ArtistServiceModel;
+import com.example.sampleproject.model.serviceModels.AlbumServiceModel;
+import com.example.sampleproject.model.serviceModels.ArtistServiceModel;
 import com.example.sampleproject.repository.AlbumRepository;
 import com.example.sampleproject.repository.ArtistRepository;
 import com.example.sampleproject.service.AlbumService;
@@ -71,10 +71,10 @@ public class ArtistServiceImpl implements ArtistService {
     @Override
     public ArtistServiceModel findByName(String name) {
         ArtistServiceModel artistServiceModel = this.artistRepository
-                .findByName(name)
+                .findByArtist(name)
                 .map(a -> {
                     ArtistServiceModel serviceModel = this.mapper.map(a, ArtistServiceModel.class);
-                    List<AlbumServiceModel> serviceModels = this.albumService.findByArtist(a.getName());
+                    List<AlbumServiceModel> serviceModels = this.albumService.findByArtist(a.getArtist());
                     serviceModel.setAlbums(serviceModels);
                     return serviceModel;
                 })
@@ -84,7 +84,7 @@ public class ArtistServiceImpl implements ArtistService {
 
     @Override
     public boolean existsByName(String name) {
-        return this.artistRepository.existsByName(name);
+        return this.artistRepository.existsByArtist(name);
     }
 
     @Override
@@ -115,7 +115,7 @@ public class ArtistServiceImpl implements ArtistService {
                 .orElseThrow(() -> new ArtistNotFoundException("Artist Entity with id " + updateModel.getId() + " was not found!"));
 
         artist
-                .setName(updateModel.getName())
+                .setArtist(updateModel.getName())
                 .setDescription(updateModel.getDescription());
 
         if (updateModel.getAlbums() != null) {
@@ -136,26 +136,25 @@ public class ArtistServiceImpl implements ArtistService {
 
     @Override
     public void loadArtists() {
-
         ArtistEntity artistEntity;
         if (artistRepository.count() == 0) {
             for (int i = 0; i < 5; i++) {
                 artistEntity = new ArtistEntity();
-                artistEntity.setName(faker.name().fullName());
+                artistEntity.setArtist(faker.name().fullName());
                 artistEntity.setDescription(faker.lorem().sentence());
                 artistRepository.save(artistEntity);
 
                 List<AlbumEntity> albums = new ArrayList<>();
-                    for (int j = 0; j < 5; j++) {
-                        AlbumEntity albumEntity = new AlbumEntity();
-                        albumEntity.setAlbumName(faker.book().title());
-                        albumEntity.setDescription(faker.lorem().sentence());
-                        albumEntity.setArtist(artistEntity);
-                        albums.add(albumEntity);
-                        albumRepository.save(albumEntity);
-                    }
-                    artistEntity.setAlbums(albums);
-                    artistRepository.save(artistEntity);
+                for (int j = 0; j < 5; j++) {
+                    AlbumEntity albumEntity = new AlbumEntity();
+                    albumEntity.setAlbumName(faker.book().title());
+                    albumEntity.setDescription(faker.lorem().sentence());
+                    albumEntity.setArtist(artistEntity);
+                    albums.add(albumEntity);
+                    albumRepository.save(albumEntity);
+                }
+                artistEntity.setAlbums(albums);
+                artistRepository.save(artistEntity);
             }
         }
     }

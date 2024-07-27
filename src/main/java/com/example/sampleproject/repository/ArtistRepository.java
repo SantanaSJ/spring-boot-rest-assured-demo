@@ -12,10 +12,10 @@ import java.util.Optional;
 public interface ArtistRepository extends JpaRepository<ArtistEntity, Long> {
 
 //Encountered a duplicated sql alias [id] during auto-discovery of a native-sql query
-    @Query(value = "SELECT a.id, a.description, a.name FROM sample_app.artists as a", nativeQuery = true)
+    @Query(value = "SELECT a.id, a.description, a.artist FROM sample_app.artists as a", nativeQuery = true)
     List<ArtistEntity> getAllArtists();
 
-    Optional<ArtistEntity> findByName(String name);
+    Optional<ArtistEntity> findByArtist(String name);
 
-    boolean existsByName(String name);
+    boolean existsByArtist(String name);
 }

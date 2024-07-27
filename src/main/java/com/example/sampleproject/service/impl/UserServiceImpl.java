@@ -4,7 +4,7 @@ import com.example.sampleproject.model.entities.AlbumEntity;
 import com.example.sampleproject.model.entities.UserEntity;
 import com.example.sampleproject.model.entities.UserRoleEntity;
 import com.example.sampleproject.model.entities.UserRoleEnum;
-import com.example.sampleproject.model.service.UserServiceModel;
+import com.example.sampleproject.model.serviceModels.UserServiceModel;
 import com.example.sampleproject.repository.AlbumRepository;
 import com.example.sampleproject.repository.UserRepository;
 import com.example.sampleproject.repository.UserRoleRepository;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+//@Transactional
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;

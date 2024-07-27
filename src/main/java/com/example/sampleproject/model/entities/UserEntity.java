@@ -16,23 +16,20 @@ public class UserEntity extends BaseEntity {
     @Column
     private String password;
 
-    @ManyToMany
+//    Hibernate uses lazy loading by default for collections to improve performance by loading them only when needed.
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_albums",
             joinColumns = @JoinColumn(name = "users_id"),
-            inverseJoinColumns = @JoinColumn(name = "albums_id")
-    )
+            inverseJoinColumns = @JoinColumn(name = "albums_id"))
     private List<AlbumEntity> albums;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_roles",
             joinColumns = @JoinColumn(name = "users_id"),
-            inverseJoinColumns = @JoinColumn(name = "roles_id")
-    )
+            inverseJoinColumns = @JoinColumn(name = "roles_id"))
     private Set<UserRoleEntity> roles = new HashSet<>();
-
-
 
     public Set<UserRoleEntity> getRoles() {
         return roles;
@@ -59,12 +56,11 @@ public class UserEntity extends BaseEntity {
         this.password = password;
     }
 
-    public List<AlbumEntity> getRecords() {
+    public List<AlbumEntity> getAlbums() {
         return albums;
     }
 
     public void setAlbums(List<AlbumEntity> albums) {
         this.albums = albums;
     }
-
 }

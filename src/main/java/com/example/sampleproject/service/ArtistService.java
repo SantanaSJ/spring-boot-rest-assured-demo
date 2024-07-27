@@ -3,7 +3,7 @@ package com.example.sampleproject.service;
 import com.example.sampleproject.model.binding.ArtistAddBindingModel;
 import com.example.sampleproject.model.binding.UpdateArtistBindingModel;
 import com.example.sampleproject.model.entities.ArtistEntity;
-import com.example.sampleproject.model.service.ArtistServiceModel;
+import com.example.sampleproject.model.serviceModels.ArtistServiceModel;
 
 import java.util.List;
 

@@ -8,12 +8,12 @@ import java.util.List;
 public class ArtistEntity extends BaseEntity {
 
     @Column
-    private String name;
+    private String artist;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "artist", fetch = FetchType.EAGER)
     private List<AlbumEntity> albums;
 
     public List<AlbumEntity> getAlbums() {
@@ -24,12 +24,12 @@ public class ArtistEntity extends BaseEntity {
         this.albums = albumEntity;
     }
 
-    public String getName() {
-        return name;
+    public String getArtist() {
+        return artist;
     }
 
-    public ArtistEntity setName(String name) {
-        this.name = name;
+    public ArtistEntity setArtist(String name) {
+        this.artist = name;
         return this;
     }
 
@@ -44,6 +44,6 @@ public class ArtistEntity extends BaseEntity {
 
     @Override
     public String toString() {
-        return name;
+        return artist;
     }
 }

@@ -1,19 +1,23 @@
 package com.example.sampleproject.service.impl;
 
 import com.example.sampleproject.exception.AlbumNotFoundException;
-import com.example.sampleproject.exception.ArtistNotFoundException;
 import com.example.sampleproject.model.binding.AlbumAddBindingModel;
+import com.example.sampleproject.model.binding.ArtistAddBindingModel;
 import com.example.sampleproject.model.binding.UpdateAlbumBindingModel;
 import com.example.sampleproject.model.entities.AlbumEntity;
 import com.example.sampleproject.model.entities.ArtistEntity;
-import com.example.sampleproject.model.service.AlbumServiceModel;
+import com.example.sampleproject.model.serviceModels.AlbumServiceModel;
 import com.example.sampleproject.repository.AlbumRepository;
 import com.example.sampleproject.repository.ArtistRepository;
 import com.example.sampleproject.service.AlbumService;
+import com.example.sampleproject.service.ArtistService;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,12 +26,14 @@ public class AlbumServiceImpl implements AlbumService {
     private final ModelMapper mapper;
     private final ArtistRepository artistRepository;
     private final AlbumRepository albumRepository;
+    private final ArtistService artistService;
 
     public AlbumServiceImpl(AlbumRepository albumRepository, ModelMapper mapper,
-                            ArtistRepository artistRepository) {
+                            ArtistRepository artistRepository, @Lazy ArtistService artistService) {
         this.albumRepository = albumRepository;
         this.mapper = mapper;
         this.artistRepository = artistRepository;
+        this.artistService = artistService;
     }
 
 
@@ -38,7 +44,7 @@ public class AlbumServiceImpl implements AlbumService {
                 .stream()
                 .map(a -> {
                     AlbumServiceModel map = this.mapper.map(a, AlbumServiceModel.class);
-                    return map.setArtist(a.getArtist().getName());
+                    return map.setArtist(a.getArtist().getArtist());
                 })
                 .collect(Collectors.toList());
         return collect;
@@ -63,7 +69,7 @@ public class AlbumServiceImpl implements AlbumService {
         AlbumServiceModel albumServiceModel = this.albumRepository.findById(id)
                 .map(v -> {
                     AlbumServiceModel map = this.mapper.map(v, AlbumServiceModel.class);
-                    map.setArtist(v.getArtist().getName());
+                    map.setArtist(v.getArtist().getArtist());
                     return map;
                 })
                 .orElseThrow(() -> new AlbumNotFoundException("Album with id " + id + " was not found!"));
@@ -77,7 +83,7 @@ public class AlbumServiceImpl implements AlbumService {
                 .orElseThrow(() -> new AlbumNotFoundException("Album with name " + album + " was not found!"));
 
         AlbumServiceModel serviceModel = this.mapper.map(albumEntity, AlbumServiceModel.class);
-        serviceModel.setArtist(albumEntity.getArtist().getName());
+        serviceModel.setArtist(albumEntity.getArtist().getArtist());
         return serviceModel;
     }
 
@@ -90,19 +96,33 @@ public class AlbumServiceImpl implements AlbumService {
     }
 
     @Override
-    public AlbumEntity addAlbum(AlbumAddBindingModel addBindingModel) {
-        ArtistEntity artist = this.artistRepository
-                .findByName(addBindingModel.getArtist())
-                .orElseThrow(() -> new ArtistNotFoundException("Artist was not found!"));
-        AlbumEntity albumEntity = this.mapper.map(addBindingModel, AlbumEntity.class);
-        albumEntity.setArtist(artist);
-        return this.albumRepository.save(albumEntity);
+    public AlbumEntity addAlbum(AlbumAddBindingModel albumAddBindingModel) {
+        Optional<ArtistEntity> optionalArtist = artistRepository
+                .findByArtist(albumAddBindingModel.getArtist());
+
+        ArtistEntity artistEntity;
+        if (optionalArtist.isEmpty()) {
+            ArtistAddBindingModel artistAddBindingModel = new ArtistAddBindingModel();
+            artistAddBindingModel.setArtist(albumAddBindingModel.getArtist());
+            artistAddBindingModel.setAlbums(new ArrayList<>());
+
+            artistEntity = artistService.addArtist(artistAddBindingModel);
+        } else {
+            artistEntity = optionalArtist.get();
+        }
+//        ArtistEntity artist = artistRepository
+//                .findByArtist(addBindingModel.getArtist())
+//                .orElseThrow(() -> new ArtistNotFoundException("Artist was not found! Please add an artist first!"));
+
+        AlbumEntity albumEntity = mapper.map(albumAddBindingModel, AlbumEntity.class);
+        albumEntity.setArtist(artistEntity);
+        return albumRepository.save(albumEntity);
     }
 
     @Override
     public AlbumServiceModel updateAlbum(UpdateAlbumBindingModel bindingModel) {
 
-        AlbumEntity albumEntity = this.albumRepository
+        AlbumEntity albumEntity = albumRepository
                 .findById(bindingModel.getId())
                 .orElseThrow(() -> new AlbumNotFoundException("Album Entity with id " + bindingModel.getId() + " was not found!"));
 
@@ -112,8 +132,8 @@ public class AlbumServiceImpl implements AlbumService {
             albumEntity.setAlbumName(bindingModel.getAlbumName());
         }
         this.albumRepository.save(albumEntity);
-        AlbumServiceModel albumServiceModel = this.mapper.map(albumEntity, AlbumServiceModel.class);
-        albumServiceModel.setArtist(albumEntity.getArtist().getName());
+        AlbumServiceModel albumServiceModel = mapper.map(albumEntity, AlbumServiceModel.class);
+        albumServiceModel.setArtist(albumEntity.getArtist().getArtist());
 
 
         return albumServiceModel;
@@ -121,17 +141,17 @@ public class AlbumServiceImpl implements AlbumService {
 
     @Override
     public void deleteAlbum(Long id) {
-        AlbumEntity albumEntity = this.albumRepository.findById(id)
+        AlbumEntity albumEntity = albumRepository.findById(id)
                 .orElseThrow(() -> new AlbumNotFoundException("Album Entity with id " + id + " was not found!"));
-        this.albumRepository.deleteById(albumEntity.getId());
+        albumRepository.deleteById(albumEntity.getId());
     }
 
     private List<AlbumServiceModel> getAlbumServiceModels(List<AlbumEntity> entities) {
         List<AlbumServiceModel> collect = entities
                 .stream()
                 .map(v -> {
-                    AlbumServiceModel map = this.mapper.map(v, AlbumServiceModel.class);
-                    map.setArtist(v.getArtist().getName());
+                    AlbumServiceModel map = mapper.map(v, AlbumServiceModel.class);
+                    map.setArtist(v.getArtist().getArtist());
                     return map;
                 })
                 .collect(Collectors.toList());

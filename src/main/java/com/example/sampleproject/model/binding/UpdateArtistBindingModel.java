@@ -1,6 +1,6 @@
 package com.example.sampleproject.model.binding;
 
-import com.example.sampleproject.model.service.AlbumServiceModel;
+import com.example.sampleproject.model.serviceModels.AlbumServiceModel;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.List;

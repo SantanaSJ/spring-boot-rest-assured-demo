@@ -13,11 +13,6 @@ public class ApplicationConfig {
         return new ModelMapper();
     }
 
-//    @Bean
-//    public PasswordEncoder passwordEncoder() {
-//        return new Pbkdf2PasswordEncoder();
-//    }
-
     @Bean
     public Faker faker() {
         return new Faker();
