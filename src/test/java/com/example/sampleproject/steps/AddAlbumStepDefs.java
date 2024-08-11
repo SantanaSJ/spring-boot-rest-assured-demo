@@ -1,6 +1,6 @@
 package com.example.sampleproject.steps;
 
-import com.example.sampleproject.exception.AlbumNotFoundException;
+import com.example.sampleproject.exception.AlbumAlreadyExistsException;
 import com.example.sampleproject.model.entities.AlbumEntity;
 import com.example.sampleproject.repository.AlbumRepository;
 import com.example.sampleproject.repository.UserRepository;
@@ -49,7 +49,7 @@ public class AddAlbumStepDefs {
     public void theAlbumByDoesNotExistInTheDatabase(String albumName, String artistName) {
         Optional<AlbumEntity> optionalAlbumEntity = albumRepository.findByAlbumNameAndArtistName(albumName, artistName);
         if (optionalAlbumEntity.isPresent()) {
-            throw new AlbumNotFoundException("Album with this name already exists!");
+            throw new AlbumAlreadyExistsException("Album with this name already exists!");
         }
     }
 
