@@ -1,5 +1,5 @@
 Feature: Retrieve artist without authentication
-  As an unauthenticated user I wan to attempt to retrieve an artist and I should be shown error message
+  As an unauthenticated user I want to attempt to retrieve an artist and I should be shown error message
 
   Background:
     Given artists exist in the DB

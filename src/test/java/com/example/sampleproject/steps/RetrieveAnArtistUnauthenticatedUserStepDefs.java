@@ -10,7 +10,7 @@ import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 
-public class UnauthenticatedUserStepDefs {
+public class RetrieveAnArtistUnauthenticatedUserStepDefs {
 
     private ArtistRepository artistRepository;
     private AlbumRepository albumRepository;
@@ -19,9 +19,9 @@ public class UnauthenticatedUserStepDefs {
     private Response response;
     private Helper helper;
 
-    public UnauthenticatedUserStepDefs(ArtistRepository artistRepository, AlbumRepository albumRepository,
-                                       UserRepository userRepository, UserRoleRepository userRoleRepository,
-                                       Helper helper) {
+    public RetrieveAnArtistUnauthenticatedUserStepDefs(ArtistRepository artistRepository, AlbumRepository albumRepository,
+                                                       UserRepository userRepository, UserRoleRepository userRoleRepository,
+                                                       Helper helper) {
         this.artistRepository = artistRepository;
         this.albumRepository = albumRepository;
         this.userRepository = userRepository;
@@ -56,5 +56,7 @@ public class UnauthenticatedUserStepDefs {
                 .response();
         helper.setResponse(response);
     }
+
+
 }
 

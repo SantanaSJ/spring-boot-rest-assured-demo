@@ -21,7 +21,7 @@ public class ApplicationSecurityConfig {
                 .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/artist/all", "/api/album/all").permitAll()
+                        .requestMatchers("/api/artist/all", "/api/album/all", "/api/csrf").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/artist/find/**", "/api/album/find/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/artist/find-by-name/**", "/api/album/find-by-album/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/artist/add", "/api/album/add").hasAnyRole("USER", "ADMIN")

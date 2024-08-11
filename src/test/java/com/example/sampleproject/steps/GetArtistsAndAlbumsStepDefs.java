@@ -8,11 +8,9 @@ import com.example.sampleproject.stepsHelpers.Helper;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
+import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
-import static io.restassured.RestAssured.get;
 import static org.hamcrest.Matchers.equalTo;
 
 public class GetArtistsAndAlbumsStepDefs {
@@ -56,7 +54,7 @@ public class GetArtistsAndAlbumsStepDefs {
 
     @When("I send a GET request to {string}")
     public void userSendsAGETRequestTo(String endpoint) {
-        response = get(endpoint);
+        response = RestAssured.get(endpoint);
         helper.setResponse(response);
     }
 

@@ -26,4 +26,11 @@ public interface AlbumRepository extends JpaRepository<AlbumEntity, Long> {
 
     boolean existsByAlbumName(String name);
 
+    @Query(value = "SELECT al.* FROM sample_app.albums as al " +
+            "JOIN sample_app.artists as a " +
+            "ON al.artist_id = a.id " +
+            "WHERE a.artist = :artistName " +
+            "AND al.album_name = :albumName ", nativeQuery = true)
+    Optional<AlbumEntity> findByAlbumNameAndArtistName(@Param("albumName") String albumName, @Param("artistName") String artistName);
+
 }
