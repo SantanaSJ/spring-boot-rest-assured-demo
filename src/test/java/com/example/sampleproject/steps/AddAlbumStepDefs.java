@@ -1,8 +1,9 @@
 package com.example.sampleproject.steps;
 
-import com.example.sampleproject.exception.AlbumAlreadyExistsException;
 import com.example.sampleproject.model.entities.AlbumEntity;
+import com.example.sampleproject.model.entities.ArtistEntity;
 import com.example.sampleproject.repository.AlbumRepository;
+import com.example.sampleproject.repository.ArtistRepository;
 import com.example.sampleproject.repository.UserRepository;
 import com.example.sampleproject.repository.UserRoleRepository;
 import com.example.sampleproject.stepsHelpers.Helper;
@@ -13,15 +14,17 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AddAlbumStepDefs {
 
     private AlbumRepository albumRepository;
+    private ArtistRepository artistRepository;
     private UserRepository userRepository;
     private UserRoleRepository userRoleRepository;
     private RequestSpecification request;
@@ -29,8 +32,9 @@ public class AddAlbumStepDefs {
     private Response response;
     private String csrfToken;
 
-    public AddAlbumStepDefs(AlbumRepository albumRepository, UserRepository userRepository, UserRoleRepository userRoleRepository, Helper helper) {
+    public AddAlbumStepDefs(AlbumRepository albumRepository, ArtistRepository artistRepository, UserRepository userRepository, UserRoleRepository userRoleRepository, Helper helper) {
         this.albumRepository = albumRepository;
+        this.artistRepository = artistRepository;
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;
         this.helper = helper;
@@ -48,17 +52,15 @@ public class AddAlbumStepDefs {
     @And("the album {string} by {string} does not exist in the database")
     public void theAlbumByDoesNotExistInTheDatabase(String albumName, String artistName) {
         Optional<AlbumEntity> optionalAlbumEntity = albumRepository.findByAlbumNameAndArtistName(albumName, artistName);
-        if (optionalAlbumEntity.isPresent()) {
-            throw new AlbumAlreadyExistsException("Album with this name already exists!");
-        }
+        assertFalse(optionalAlbumEntity.isPresent(), "Album " + albumName + "by " + artistName + " already exists in the database.");
     }
 
     @When("I send a POST request to {string} with a valid request body with {string}, {string}, {string}  and CSRF token")
     public void iSendAPOSTRequestToWithAValidRequestBodyAndCSRFToken(String endpoint, String artistName, String albumName, String description) {
         JsonObject requestBody = new JsonObject();
         requestBody
-                .add("artist", artistName + "NEW")
-                .add("albumName", albumName + "NEW")
+                .add("artist", artistName)
+                .add("albumName", albumName)
                 .add("description", description);
         String body = requestBody.toString();
 
@@ -80,6 +82,31 @@ public class AddAlbumStepDefs {
 
     @And("the response message should be {string}")
     public void theResponseMessageShouldBe(String message) {
-        response.then().body("message", equalTo(message));
+        response.then().assertThat().body("message", equalTo(message));
+    }
+
+    @And("the album {string} by {string} exists in the database")
+    public void theAlbumByExistsInTheDatabase(String albumName, String artistName) {
+        ArtistEntity artist = new ArtistEntity();
+        artist.setArtist(artistName);
+        artist.setAlbums(new ArrayList<>());
+        artistRepository.save(artist);
+
+        AlbumEntity albumEntity = new AlbumEntity();
+        albumEntity.setAlbumName(albumName);
+        albumEntity.setArtist(artist);
+        artist.getAlbums().add(albumEntity);
+        albumRepository.save(albumEntity);
+        artistRepository.save(artist);
+        System.out.println();
+    }
+
+    @And("the response message should be {string} and timestamp should not be null")
+    public void theResponseMessageShouldBeAndTimestampShouldNotBeNull(String  message) {
+        response
+                .then()
+                .assertThat()
+                .body("message", equalTo(message))
+                .body("timestamp", notNullValue());
     }
 }
