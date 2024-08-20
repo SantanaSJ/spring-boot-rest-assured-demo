@@ -9,9 +9,6 @@ import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.restassured.RestAssured;
 import io.restassured.filter.log.ErrorLoggingFilter;
-import io.restassured.filter.log.LogDetail;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
 
 public class Hooks {
 
@@ -36,8 +33,8 @@ public class Hooks {
         dataLoaderService.loadData();
 
         RestAssured.filters(
-                new RequestLoggingFilter(LogDetail.ALL),
-                new ResponseLoggingFilter(LogDetail.ALL),
+//                new RequestLoggingFilter(LogDetail.ALL),
+//                new ResponseLoggingFilter(LogDetail.ALL),
                 new ErrorLoggingFilter());
     }
 
