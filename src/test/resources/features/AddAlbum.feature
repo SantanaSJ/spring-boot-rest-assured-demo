@@ -5,6 +5,7 @@ Feature: Add artists
     Given I am an authenticated "<user>" with "<role>"
     And CSRF token is valid and present
     And the album "<albumName>" by "<artistName>" does not exist in the database
+#    and the artist exists
     When I send a POST request to "<endpoint>" with a valid request body with "<artistName>", "<albumName>", "<albumDescription>"  and CSRF token
     Then the response code should be <code>
     And the location header should be present
@@ -28,3 +29,15 @@ Feature: Add artists
       | endpoint       | user          | role  | code | artistName  | albumName  | albumDescription                                               |
       | /api/album/add | TestUser      | USER  | 409  | TestArtist1 | testAlbum1 | Dolorum laborum quod et laboriosam recusandae dolorum placeat. |
       | /api/album/add | AdminTestUser | ADMIN | 409  | TestArtist2 | testAlbum2 | Assumenda et quas.                                             |
+
+  Scenario Outline: Add an album with invalid request body
+    Given I am an authenticated "<user>" with "<role>"
+    And CSRF token is valid and present
+    When I send a POST request to "<endpoint>" with a invalid request body with "<invalidArtistName>", "<invalidAlbumName>", "<invalidAlbumDescription>"  and valid CSRF token
+    Then the response code should be <code>
+    And the response message should be "Invalid data!" and timestamp should not be null
+
+    Examples:
+      | endpoint       | user          | role  | code | invalidArtistName | invalidAlbumName | invalidAlbumDescription |
+      | /api/album/add | TestUser      | USER  | 400  |                   |                  |                         |
+      | /api/album/add | AdminTestUser | ADMIN | 400  |                   |                  |                         |

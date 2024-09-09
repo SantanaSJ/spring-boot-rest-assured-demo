@@ -98,15 +98,33 @@ public class AddAlbumStepDefs {
         artist.getAlbums().add(albumEntity);
         albumRepository.save(albumEntity);
         artistRepository.save(artist);
-        System.out.println();
     }
 
     @And("the response message should be {string} and timestamp should not be null")
-    public void theResponseMessageShouldBeAndTimestampShouldNotBeNull(String  message) {
+    public void theResponseMessageShouldBeAndTimestampShouldNotBeNull(String message) {
         response
                 .then()
                 .assertThat()
                 .body("message", equalTo(message))
                 .body("timestamp", notNullValue());
+    }
+
+    @When("I send a POST request to {string} with a invalid request body with {string}, {string}, {string}  and valid CSRF token")
+    public void iSendAPOSTRequestToWithAInvalidRequestBodyWithAndValidCSRFToken(String endpoint, String invalidArtistName, String invalidAlbumName, String invalidAlbumDescription) {
+
+        JsonObject requestBody = new JsonObject();
+        requestBody.add("artist", invalidArtistName);
+        requestBody.add("albumName", invalidAlbumName);
+        requestBody.add("description", invalidAlbumDescription);
+        String body = requestBody.toString();
+
+        response = helper.getRequest()
+                .header("X-XSRF-TOKEN", csrfToken)
+                .cookie("XSRF-TOKEN", csrfToken)
+                .contentType("application/json")
+                .body(body)
+                .post(endpoint);
+
+        helper.setResponse(response);
     }
 }
